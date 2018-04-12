@@ -1,6 +1,10 @@
 import json
 import requests
+from firebase import firebase
 
+post = raw_input('Hey! What is happening? ')
+firebase = firebase.FirebaseApplication('https://prediction-bd050.firebaseio.com', None)
+result = firebase.post('/posts', post)
 
 def auth(customer_id, api_key):
     try:
@@ -49,8 +53,10 @@ def predict_from_text(token, text):
 token = auth(3638, 'sgi70ghc2dm27lbnvk8psjfnbf')
 
 # /text
-prediction_result = predict_from_text(token, 'Lorem ipsum dolor sit amet')
+prediction_result = predict_from_text(token, post)
 print json.dumps(prediction_result, indent=4)
+
+result = firebase.post('/predictions', prediction_result)
 
 # # /like ids
 # prediction_result = predict_from_like_ids(token, ["5845317146", "6460713406", "22404294985", "35312278675",
