@@ -1,10 +1,15 @@
 import json
 import requests
 from firebase import firebase
+from flask import Flask
+from flask import request
+from flask import render_template
 
-post = raw_input('Hey! What is happening? ')
+# post = raw_input('Hey! What is happening? ')
 firebase = firebase.FirebaseApplication('https://prediction-bd050.firebaseio.com', None)
-result = firebase.post('/posts', post)
+# result = firebase.post('/posts', post)
+
+app = Flask(__name__)
 
 def auth(customer_id, api_key):
     try:
@@ -18,7 +23,6 @@ def auth(customer_id, api_key):
     except requests.exceptions.HTTPError as e:
         print e.response.json()
 
-
 def predict_from_text(token, text):
     try:
         response = requests.post(url='https://api.applymagicsauce.com/text',
@@ -31,6 +35,28 @@ def predict_from_text(token, text):
         return response.json()
     except requests.exceptions.HTTPError as e:
         print e.response.json()
+
+# /auth
+token = auth(3638, 'sgi70ghc2dm27lbnvk8psjfnbf')
+
+# /start the app
+@app.route('/')
+def my_form():
+    return render_template("index.html")
+
+@app.route('/', methods=['POST'])
+def my_form_post():
+    text = request.form['text']
+    result = firebase.post('/posts', text)
+
+    prediction_result = predict_from_text(token, text)
+    print json.dumps(prediction_result, indent=4)
+    result = firebase.post('/predictions', prediction_result)
+
+    return text
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')
 
 
 # def predict_from_like_ids(token, like_ids):
@@ -48,15 +74,6 @@ def predict_from_text(token, text):
 #     except ValueError as e:
 #         print e
 
-
-# /auth
-token = auth(3638, 'sgi70ghc2dm27lbnvk8psjfnbf')
-
-# /text
-prediction_result = predict_from_text(token, post)
-print json.dumps(prediction_result, indent=4)
-
-result = firebase.post('/predictions', prediction_result)
 
 # # /like ids
 # prediction_result = predict_from_like_ids(token, ["5845317146", "6460713406", "22404294985", "35312278675",
