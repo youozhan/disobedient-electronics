@@ -4,10 +4,25 @@ from firebase import firebase
 from flask import Flask
 from flask import request
 from flask import render_template
+import pyrebase
 
 # post = raw_input('Hey! What is happening? ')
-firebase = firebase.FirebaseApplication('https://prediction-bd050.firebaseio.com', None)
+# firebase = firebase.FirebaseApplication('https://prediction-bd050.firebaseio.com', None)
 # result = firebase.post('/posts', post)
+
+config = {
+  "apiKey": "AIzaSyAt3SehcP9qPDvLTgrCXeWmwWo15MzBTqA",
+  "authDomain": "prediction-bd050.firebaseapp.com",
+  "databaseURL": "https://prediction-bd050.firebaseio.com",
+  "storageBucket": "prediction-bd050.appspot.com",
+  "serviceAccount": "/Users/yz/Documents/GitHub/disobedient-electronics/prediction-0308f7f153ab.json"
+}
+firebase = pyrebase.initialize_app(config)
+
+auth = firebase.auth()
+#authenticate a user
+user = auth.sign_in_with_email_and_password("youchunyz@gmail.com", "eadesigner")
+db = firebase.database()
 
 app = Flask(__name__)
 
@@ -47,36 +62,14 @@ def my_form():
 @app.route('/', methods=['POST'])
 def my_form_post():
     text = request.form['text']
-    result = firebase.post('/posts', text)
+    # result = firebase.post('/posts', text)
 
     prediction_result = predict_from_text(token, text)
     print json.dumps(prediction_result, indent=4)
-    result = firebase.post('/predictions', prediction_result)
+    db.set(prediction_result, user['idToken'])
+    # result = firebase.post('/predictions', prediction_result)
 
     return text
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
-
-
-# def predict_from_like_ids(token, like_ids):
-#     try:
-#         response = requests.post(url='https://api.applymagicsauce.com/like_ids',
-#                                  json=like_ids,
-#                                  headers={'X-Auth-Token': token})
-#         response.raise_for_status()
-#         if response.status_code == 204:
-#             raise ValueError('Not enough predictive like ids provided to make a prediction')
-#         else:
-#             return response.json()
-#     except requests.exceptions.HTTPError as e:
-#         print e.response.json()
-#     except ValueError as e:
-#         print e
-
-
-# # /like ids
-# prediction_result = predict_from_like_ids(token, ["5845317146", "6460713406", "22404294985", "35312278675",
-#                                                   "105930651606", "171605907303", "199592894970", "274598553922",
-#                                                   "340368556015", "100270610030980"])
-# print json.dumps(prediction_result, indent=4)
