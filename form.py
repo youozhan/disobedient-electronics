@@ -5,7 +5,10 @@ from flask import Flask
 from flask import request
 from flask import render_template
 import pyrebase
+import serial
+from time import sleep
 
+# prompt user in terminal to get input
 # post = raw_input('Hey! What is happening? ')
 # firebase = firebase.FirebaseApplication('https://prediction-bd050.firebaseio.com', None)
 # result = firebase.post('/posts', post)
@@ -19,8 +22,8 @@ config = {
 }
 firebase = pyrebase.initialize_app(config)
 
+# authenticate a user
 auth = firebase.auth()
-#authenticate a user
 user = auth.sign_in_with_email_and_password("youchunyz@gmail.com", "eadesigner")
 db = firebase.database()
 
@@ -68,6 +71,27 @@ def my_form_post():
     print json.dumps(prediction_result, indent=4)
     db.set(prediction_result, user['idToken'])
     # result = firebase.post('/predictions', prediction_result)
+
+    ser = serial.Serial('/dev/tty.usbmodem14611', 9600)
+    print ser 
+    print "Sending serial data"
+    print prediction_result
+
+    # counter = 32
+    # while True:
+    #     counter +=1
+    #     ser.write(counter)
+    #     print ser.readline()
+    #     sleep(.1)
+    
+    counter = 32
+    while True:
+        counter +=1
+        ser.write(str(chr(counter))) # Convert the decimal number to ASCII then send it to the Arduino
+        print ser.readline() # Read the newest output from the Arduino
+        sleep(.1) # Delay for one tenth of a second
+        if counter == 255:
+            counter = 32
 
     return text
 
