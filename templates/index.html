@@ -1,13 +1,13 @@
 <html>
     <head>
         <title>Post prototype</title>
-        <link rel="stylesheet" type="text/css" href="css/style.css">
+        <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css')}}">
     </head>
     <body>
         <p>Hey! What's happending?</p>
         <form action="." method="POST">
             <!-- <input type="text" name="text"> -->
-            <textarea class="form-control" style="width:300px; height:150px" id="input_text" name="text"></textarea><br><br>
+            <textarea class="form-control" id="input_text" name="text"></textarea><br><br>
             <input type="submit" name="my-form" value="Go">
         </form>
     </body>
