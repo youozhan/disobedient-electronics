@@ -8,11 +8,6 @@ import pyrebase
 import serial
 from time import sleep
 
-# prompt user in terminal to get input
-# post = raw_input('Hey! What is happening? ')
-# firebase = firebase.FirebaseApplication('https://prediction-bd050.firebaseio.com', None)
-# result = firebase.post('/posts', post)
-
 config = {
   "apiKey": "AIzaSyAt3SehcP9qPDvLTgrCXeWmwWo15MzBTqA",
   "authDomain": "prediction-bd050.firebaseapp.com",
@@ -23,11 +18,13 @@ config = {
 firebase = pyrebase.initialize_app(config)
 
 # authenticate a user
-auth = firebase.auth()
-user = auth.sign_in_with_email_and_password("youchunyz@gmail.com", "eadesigner")
+# authUser = firebase.auth()
+user = firebase.auth().sign_in_with_email_and_password("youchunyz@gmail.com", "eadesigner")
 db = firebase.database()
 
 app = Flask(__name__)
+
+ser = serial.Serial('/dev/tty.usbmodem14111', 9600)
 
 def auth(customer_id, api_key):
     try:
@@ -45,19 +42,21 @@ def predict_from_text(token, text):
     try:
         response = requests.post(url='https://api.applymagicsauce.com/text',
                                  params={
-                                     'source': 'OTHER'
-                                 },
+                                     'source': 'STATUS_UPDATE',
+                                     'traits': 'BIG5_Neuroticism,BIG5_Agreeableness,BIG5_Openness,BIG5_Extraversion,BIG5_Conscientiousness'
+                                },
                                  data=text,
                                  headers={'X-Auth-Token': token})
         response.raise_for_status()
+        print (response.url)
         return response.json()
     except requests.exceptions.HTTPError as e:
         print e.response.json()
 
-# /auth
+# auth
 token = auth(3638, 'sgi70ghc2dm27lbnvk8psjfnbf')
 
-# /start the app
+# start the app
 @app.route('/')
 def my_form():
     return render_template("index.html")
@@ -65,35 +64,24 @@ def my_form():
 @app.route('/', methods=['POST'])
 def my_form_post():
     text = request.form['text']
-    # result = firebase.post('/posts', text)
 
     prediction_result = predict_from_text(token, text)
     print json.dumps(prediction_result, indent=4)
     db.set(prediction_result, user['idToken'])
-    # result = firebase.post('/predictions', prediction_result)
 
-    ser = serial.Serial('/dev/tty.usbmodem14611', 9600)
-    print ser 
+    # get the value from response
     print "Sending serial data"
-    print prediction_result
+    for index in range(0,5):
+        value = prediction_result['predictions'][index]['value']
+        print value
 
-    # counter = 32
-    # while True:
-    #     counter +=1
-    #     ser.write(counter)
-    #     print ser.readline()
-    #     sleep(.1)
-    
-    counter = 32
-    while True:
-        counter +=1
-        ser.write(str(chr(counter))) # Convert the decimal number to ASCII then send it to the Arduino
-        print ser.readline() # Read the newest output from the Arduino
-        sleep(.1) # Delay for one tenth of a second
-        if counter == 255:
-            counter = 32
+        # send the value through serial
+        ser.write(chr(int(value*127)))
+        print (chr(int(value*127)))
+        print ser.readline()
 
     return text
 
 if __name__ == '__main__':
     app.run()
+    
