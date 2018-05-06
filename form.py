@@ -24,6 +24,7 @@ db = firebase.database()
 
 app = Flask(__name__)
 
+# enable later
 ser = serial.Serial('/dev/tty.usbmodem14111', 9600)
 
 def auth(customer_id, api_key):
@@ -69,6 +70,7 @@ def my_form_post():
     print json.dumps(prediction_result, indent=4)
     db.set(prediction_result, user['idToken'])
 
+    # enable later
     # get the value from response
     print "Sending serial data"
     for index in range(0,5):
@@ -80,7 +82,7 @@ def my_form_post():
         print (chr(int(value*127)))
         print ser.readline()
 
-    return text
+    return render_template("index.html")
 
 if __name__ == '__main__':
     app.run()

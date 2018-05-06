@@ -1,14 +1,20 @@
 <html>
     <head>
-        <title>Post prototype</title>
+        <title>Youchun's Facebook page</title>
         <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css')}}">
+        <link rel="icon" href="{{url_for('static', filename='favicon.ico')}}" type="image/x-icon" />
     </head>
     <body>
-        <p>Hey! What's happending?</p>
-        <form action="." method="POST">
-            <!-- <input type="text" name="text"> -->
-            <textarea class="form-control" id="input_text" name="text"></textarea><br><br>
-            <input type="submit" name="my-form" value="Go">
-        </form>
+        <!-- <div id="banner">
+            <img src="{{url_for('static', filename='header.png')}}" alt="Facebook header">
+        </div> -->
+        <div id="post">
+                <p>Make Post | Photo/Video Album | Live Video</p>
+                <form action="." method="POST">
+                    <!-- <input type="text" name="text"> -->
+                    <textarea class="form-control" id="input_text" name="text" placeholder="What's on your mind, Youchun?"></textarea><br><br>
+                    <input type="submit" name="my-form" value="Post">
+                </form>
+        </div>
     </body>
 </html>
