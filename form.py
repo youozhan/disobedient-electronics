@@ -73,14 +73,30 @@ def my_form_post():
     # enable later
     # get the value from response
     print "Sending serial data"
+    value = []
     for index in range(0,5):
-        value = prediction_result['predictions'][index]['value']
-        print value
+        temp = prediction_result['predictions'][index]['trait']
+        output = prediction_result['predictions'][index]['value']
+        if temp == 'BIG5_Agreeableness':
+            value.insert(0, output)
+        else:
+            if temp == 'BIG5_Neuroticism':
+                value.insert(1, output)
+            else: 
+                if temp == 'BIG5_Openness':
+                   value.insert(2, output)
+                else:
+                    if temp == 'BIG5_Conscientiousness':
+                        value.insert(3, output)
+                    else:
+                        if temp == 'BIG5_Extraversion':
+                            value.insert(4, output)
 
+    for index in range(0,5):
         # send the value through serial
-        ser.write(chr(int(value*127)))
-        print (chr(int(value*127)))
-        print ser.readline()
+        ser.write(chr(int(value[index]*127)))
+        print (int(value[index]*127)*4+240)
+        # print ser.readline()
 
     return render_template("index.html")
 
