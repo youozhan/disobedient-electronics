@@ -25,13 +25,13 @@ db = firebase.database()
 app = Flask(__name__)
 
 # enable later
-ser = serial.Serial('/dev/tty.usbmodem14111', 9600)
+ser = serial.Serial('/dev/tty.usbmodem14511', 9600)
 
 def auth(customer_id, api_key):
     try:
         credentials = {
-            'customer_id': 3638,
-            'api_key': 'sgi70ghc2dm27lbnvk8psjfnbf'
+            'customer_id': 3784,
+            'api_key': '1sj1hkm5pooqou5ha8u8iju1vd'
         }
         response = requests.post('https://api.applymagicsauce.com/auth', json=credentials)
         response.raise_for_status()
